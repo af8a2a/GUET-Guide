@@ -1,0 +1,55 @@
+DATA		SEGMENT
+STRING1	DB		'INPUT STRING: $'	;键入提示性语句
+STRING2	DB		'OUTPUT STRING: $'	;输出提示性语句
+BUF		DB		30					;定义可接收的最大字符数
+		DB		?					;实际输入的字符个数
+		DB		30		DUP(?)		;输入的字符存放在此区域
+DATA		ENDS
+CODE		SEGMENT
+		ASSUME	CS:CODE,DS:DATA	
+START:	MOV		AX,DATA						;
+		MOV		DS,AX
+		LEA		DX,STRING1				;提示输入字符串
+		MOV 	AH,09H				;09H号功能调用
+		INT 	21H
+		LEA 	DX,BUF
+		MOV 	AH,0AH				;键盘输入字符串
+		INT 	21H
+		MOV		AH,02H				;02H号功能调用，显示单字符
+		MOV		DL,0DH
+		INT		21H
+		MOV		AH,02H
+		MOV		DL,0AH				;换行
+		INT		21H
+		LEA		DX,STRING2				;输出提示
+		MOV 	AH,09H				;09H号功能调用，显示字符串						
+		INT 	21H
+		LEA 	SI,BUF[1]				;取出字符串长度
+		MOV		CL,[SI]
+		MOV 	CH,00H
+		LEA 	SI,BUF[2]				;取字符串首地址
+L1:		MOV 	AL,[SI]
+		CMP 	AL,24H				;检测是否为$字符
+		JZ  	L3
+		CMP 	AL,61H				;比较输入字符与a的ASCII码值
+		JB 		L2
+		CMP 	AL,7AH
+		JA  	L2
+		SUB 	AL,20H				;检测到小写字符则减去20H
+L2:		MOV 	[SI],AL				;检测到字符不是小写且不是$字符
+		INC		SI
+		LOOP 	L1
+L3:		LEA 	DX,BUF+2
+		MOV 	AH,09H						;显示字符串
+		INT 	21H
+		MOV 	AH,4CH
+		INT 	21H
+CODE		ENDS
+		END		START
+
+	
+	
+
+
+
+

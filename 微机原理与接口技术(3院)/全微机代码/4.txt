@@ -1,0 +1,75 @@
+DATA  SEGMENT
+DATA  ENDS
+CODE  SEGMENT
+      ASSUME   CS:CODE,DS:DATA
+START:MOV    AX,  DATA
+      MOV    DS,AX
+	MOV    AL,80H	;INIT
+      MOV    DX,28BH
+      OUT    DX,AL	
+
+LOP:  MOV    AL,24H	;left green right red
+      MOV    DX,28AH
+      OUT    DX,AL
+	CALL DELAY
+
+	MOV CX,5	;set 5 times
+FLASH1:MOV    AL,44H	;left yellow led flash
+      OUT    DX,AL
+	CALL DELAYS
+	MOV    AL,04H
+      OUT    DX,AL
+	CALL DELAYS
+	LOOP FLASH1
+	
+	MOV    AL,81H	;left red right green
+      OUT    DX,AL
+	CALL DELAY
+	
+	MOV CX,5
+FLASH2:			;right yellow led flash
+	MOV AL,82H
+	OUT DX,AL
+	CALL DELAYS
+	MOV    AL,80H
+      OUT    DX,AL
+	CALL DELAYS
+	LOOP FLASH2
+
+	LOOP LOP	;loop
+
+	MOV AH,4CH
+	INT 21H
+DELAY PROC NEAR	;long time delay program
+	PUSH CX
+	PUSH DI
+	MOV CX,500H
+Y1:	MOV DI,1000H
+X1:	DEC DI
+	JNZ X1
+	LOOP Y1
+	POP DI
+	POP CX
+	RET
+DELAY	ENDP
+
+DELAYS PROC NEAR	;short time delay program
+	PUSH CX
+	PUSH DI
+	MOV CX,100H
+SY1:	MOV DI,1000H
+SX1:	DEC DI
+	JNZ SX1
+	LOOP SY1
+	POP DI
+	POP CX
+	RET
+DELAYS	ENDP
+	
+	
+CODE  ENDS
+      END  START
+
+
+
+
